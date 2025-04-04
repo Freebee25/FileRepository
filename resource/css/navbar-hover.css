@@ -1,0 +1,17 @@
+/* Hover effect for nav links */
+.nav-link {
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.nav-link:hover {
+    color: white !important;
+    background-color: #007bff !important; /* Bootstrap primary color */
+    border-radius: 5px;
+}
+
+/* Hover effect for logout button */
+.btn-light:hover {
+    background-color: #dc3545 !important; /* Bootstrap danger color */
+    color: white !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}

@@ -1,0 +1,31 @@
+body {
+    background-color: #fff;
+    color: #000;
+}
+.otp-box {
+    background-color: #f3f3f3;
+    padding: 30px;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 400px;
+}
+.otp-input {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    text-align: center;
+    margin: 0 5px;
+    background-color: #f3f3f3;
+    color: #000000;
+    border: 1px solid #444;
+    border-radius: 5px;
+}
+.otp-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px #007bff;
+}
+.countdown {
+    font-size: 18px;
+    color: red;
+}
