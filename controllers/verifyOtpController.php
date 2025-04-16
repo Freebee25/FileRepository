@@ -1,6 +1,6 @@
 <?php
 require '../database/db.php';
-require '../helpers/sha256.php'; 
+require '../helpers/Sha3.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     session_start();
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $current_time = (new DateTime())->format('Y-m-d H:i:s');
 
         // Hash OTP input menggunakan SHA256 sebelum validasi
-        $hashed_input_otp = SHA256::make((string)$otp);
+        $hashed_input_otp = hash('sha3-256', (string)$otp);
 
         // Validasi OTP dan waktu kedaluwarsa
         if ($hashed_input_otp === $user['otp'] && $current_time <= $user['otp_expires_at']) {

@@ -1,7 +1,7 @@
 <?php
 require '../database/db.php';
 require '../helpers/mailer.php';
-require '../helpers/sha256.php';
+require '../helpers/Sha3.php'; 
 
 session_start();
 
@@ -18,11 +18,14 @@ $stmt->execute([$user_id]);
 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if ($user) {
-    // Generate OTP baru menggunakan SHA-256
+    // Generate OTP baru menggunakan SHA-3
     $timestamp = time();
     $otp_raw = $user['username'] . $timestamp;
-    $otp = substr(preg_replace('/[^0-9]/', '', SHA256::make($otp_raw)), 0, 6); // Ambil 6 angka pertama
-    $hashed_otp = SHA256::make($otp);
+    
+    $otp_hash = hash('sha3-256', $otp_raw);
+    $otp = substr(preg_replace('/[^0-9]/', '', $otp_hash), 0, 6); // Ambil 6 angka pertama
+
+    $hashed_otp = hash('sha3-256', $otp);
     $otp_expires_at = date("Y-m-d H:i:s", strtotime("+2 minutes"));
 
     // Simpan hash OTP baru ke database
