@@ -13,7 +13,6 @@
     <header class="bg-light text-white p-3">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="d-flex align-items-center">
-                <!-- <img src="logo.png" alt="Pertamina Logo" style="width: 150px; height: auto;"> -->
             </div>
             <nav>
                 <ul class="nav">
