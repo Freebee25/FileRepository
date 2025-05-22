@@ -63,8 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $ctr = new CTR($aes);
         $ciphertext = $ctr->encrypt($plaintext, $nonce);
 
-        $output = $nonce . $ciphertext;
-        file_put_contents($encryptedPath, $output);
+        $output = base64_encode($nonce . $ciphertext);
+        file_put_contents($encryptedPath, $output);    
 
        // Simpan ke DB (tabel sesuai struktur yang kamu kirim)
         $stmt = $conn->prepare("INSERT INTO dokumen (nama_file, size_file, tanggal_upload, deskripsi, path, password)
