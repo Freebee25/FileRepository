@@ -72,7 +72,7 @@ if (isset($_GET['status'])) {
         <div class="card">
             <div class="card-header">Upload Dokumen</div>
             <div class="card-body">
-                <form action="../../controllers/uploadController.php" method="POST" enctype="multipart/form-data">
+                <form action="../../controllers/encrypt.php" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
                         <label for="tanggal_upload" class="form-label">Tanggal Upload:</label>
                         <input type="text" class="form-control" name="tanggal_upload" id="tanggal_upload" value="<?php echo date('Y-m-d H:i:s'); ?>" disabled>
@@ -81,6 +81,10 @@ if (isset($_GET['status'])) {
                         <label for="file" class="form-label">Pilih Dokumen:</label>
                         <input type="file" class="form-control" name="file" id="file" required>
                         <small class="form-text text-muted">Hanya file PDF, DOCX, XLSX, dan XLS yang diperbolehkan. Ukuran file maksimal 10 MB.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" class="form-control" name="password" id="password" required>
                     </div>
                     <div class="mb-3">
                         <label for="deskripsi" class="form-label">Deskripsi Dokumen:</label>
