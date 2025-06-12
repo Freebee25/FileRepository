@@ -1,8 +1,12 @@
 <?php
 require '../../database/db.php';
-session_start();
 
-if (!isset($_SESSION['user_id'])) {
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Redirect jika belum login
+if (!isset($_SESSION['user'])) {
     header("Location: login.php");
     exit;
 }
@@ -43,12 +47,7 @@ try {
     <div class="container mt-4">
         <div class="alert alert-info" role="alert">
             Selamat Datang di Sistem Aplikasi
-            <strong>
-                <?php
-                // Menampilkan username
-                echo htmlspecialchars($_SESSION['username'], ENT_QUOTES, 'UTF-8');
-                ?>
-            </strong><br>
+            <strong><?= htmlspecialchars($_SESSION['user']['username']) ?></strong><br>
         </div>
 
         <!-- Card Jumlah File -->
@@ -83,14 +82,14 @@ try {
                             <?php foreach ($recentFiles as $index => $file): ?>
                                 <tr>
                                     <td><?= $index + 1 ?></td>
-                                    <td><?= htmlspecialchars($file['nama_file'], ENT_QUOTES, 'UTF-8') ?></td>
-                                    <td><?= number_format(htmlspecialchars($file['size_file'], ENT_QUOTES, 'UTF-8') / (1024 * 1024), 2) ?> MB</td>
-                                    <td><?= htmlspecialchars($file['tanggal_upload'], ENT_QUOTES, 'UTF-8') ?></td>
+                                    <td><?= htmlspecialchars($file['nama_file']) ?></td>
+                                    <td><?= number_format($file['size_file'] / (1024 * 1024), 2) ?> MB</td>
+                                    <td><?= htmlspecialchars($file['tanggal_upload']) ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="5" class="text-center">Tidak ada dokumen terbaru.</td>
+                                <td colspan="4" class="text-center">Tidak ada dokumen terbaru.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>

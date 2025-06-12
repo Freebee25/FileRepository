@@ -35,8 +35,15 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         sendMail($user['email'], $subject, $message);
 
         session_start();
+
+        // Simpan data user lengkap ke session
         $_SESSION['otp_user_id'] = $user['id'];
-        $_SESSION['username'] = $user['username'];
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'email' => $user['email'],
+            'role' => $user['role']
+        ];
 
         header("Location: ../resource/views/verify_otp.php");
         exit;

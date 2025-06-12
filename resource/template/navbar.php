@@ -1,3 +1,9 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -37,17 +43,27 @@
             <!-- User Dropdown -->
             <div class="dropdown">
                 <button onclick="toggleDropdown()" id="userDropdown" class="btn btn-light dropdown-toggle" type="button">
-                    <i class="fa fa-user"></i> <?php echo htmlspecialchars($_SESSION['username']); ?>
+                    <i class="fa fa-user"></i>
+                    <?php
+                        echo isset($_SESSION['user']['username']) 
+                            ? htmlspecialchars($_SESSION['user']['username']) 
+                            : 'Guest';
+                    ?>
                 </button>
-                <div id="dropdownMenu" class="dropdown-menu dropdown-menu-end mt-2 shadow-sm">
-                    <a class="dropdown-item" href="../views/manageakun.php">
-                        <i class="fa fa-cog me-2"></i> Manage Akun
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item text-danger" href="../../controllers/logout.php">
-                        <i class="fa fa-sign-out me-2"></i> Logout
-                    </a>
-                </div>
+
+                <?php if (isset($_SESSION['user'])): ?>
+                    <div id="dropdownMenu" class="dropdown-menu dropdown-menu-end mt-2 shadow-sm">
+                        <?php if ($_SESSION['user']['role'] === 'admin'): ?>
+                            <a class="dropdown-item" href="../views/manage_user.php">
+                                <i class="fa fa-cog me-2"></i> Manage Akun
+                            </a>
+                            <div class="dropdown-divider"></div>
+                        <?php endif; ?>
+                        <a class="dropdown-item text-danger" href="../../controllers/logout.php">
+                            <i class="fa fa-sign-out me-2"></i> Logout
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </header>
@@ -55,15 +71,16 @@
     <script>
         function toggleDropdown() {
             const menu = document.getElementById('dropdownMenu');
-            menu.classList.toggle('show');
+            if (menu) {
+                menu.classList.toggle('show');
+            }
         }
 
-        // Tutup dropdown jika klik di luar
         window.addEventListener('click', function (e) {
             const button = document.getElementById('userDropdown');
             const menu = document.getElementById('dropdownMenu');
 
-            if (!button.contains(e.target) && !menu.contains(e.target)) {
+            if (button && menu && !button.contains(e.target) && !menu.contains(e.target)) {
                 menu.classList.remove('show');
             }
         });
