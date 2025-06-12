@@ -5,7 +5,6 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-// Notifikasi jika ada error atau success
 $notification = '';
 if (isset($_GET['status'])) {
     switch ($_GET['status']) {
@@ -24,17 +23,31 @@ if (isset($_GET['status'])) {
         case 'success':
             $notification = "<div class='notification alert alert-success'>Dokumen berhasil diupload!</div>";
             break;
+        case 'db_error':
+            $notification = "<div class='notification alert alert-danger'>Gagal menyimpan data ke database.</div>";
+            break;
+        case 'invalid_kategori':
+            $notification = "<div class='notification alert alert-danger'>Kategori tidak valid.</div>";
+            break;
         default:
             $notification = "";
             break;
     }
 }
+
+require_once '../../database/db.php';
+
+$kategoriOptions = '';
+$stmt = $conn->query("SELECT * FROM kategori_files ORDER BY nama_kategori ASC");
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    $kategoriOptions .= "<option value='{$row['id']}'>{$row['nama_kategori']}</option>";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Dokumen</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../fontawesome/css/font-awesome.min.css">
@@ -49,23 +62,18 @@ if (isset($_GET['status'])) {
             margin-left: auto;
             margin-right: auto;
         }
-
         .alert-success {
             background-color: #d4edda;
             color: #155724;
         }
-
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
         }
     </style>
 </head>
-
 <body>
     <?php include '../template/navbar.php'; ?>
-
-    <!-- Notifikasi -->
     <?php echo $notification; ?>
 
     <div class="container mt-4">
@@ -74,13 +82,22 @@ if (isset($_GET['status'])) {
             <div class="card-body">
                 <form action="../../controllers/encrypt.php" method="POST" enctype="multipart/form-data">
                     <div class="mb-3">
-                        <label for="tanggal_upload" class="form-label">Tanggal Upload:</label>
-                        <input type="text" class="form-control" name="tanggal_upload" id="tanggal_upload" value="<?php echo date('Y-m-d H:i:s'); ?>" disabled>
+                        <label class="form-label">Tanggal Upload:</label>
+                        <input type="text" class="form-control" value="<?php echo date('Y-m-d H:i:s'); ?>" readonly>
+                        <input type="hidden" name="tanggal_upload" value="<?php echo date('Y-m-d H:i:s'); ?>">
                     </div>
                     <div class="mb-3">
                         <label for="file" class="form-label">Pilih Dokumen:</label>
                         <input type="file" class="form-control" name="file" id="file" required>
-                        <small class="form-text text-muted">Hanya file PDF, DOCX, XLSX, dan XLS yang diperbolehkan. Ukuran file maksimal 10 MB.</small>
+                        <small class="form-text text-muted">Hanya file PDF, DOCX, XLSX, dan XLS yang diperbolehkan. Ukuran maksimal 10 MB.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="kategori_id" class="form-label">Kategori Dokumen:</label>
+                        <select name="kategori_id" id="kategori_id" class="form-control" required>
+                            <option value="">-- Pilih Kategori --</option>
+                            <?php echo $kategoriOptions; ?>
+                            <option value="tambah">+ Tambah Kategori Baru</option>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="password" class="form-label">Password:</label>
@@ -95,5 +112,58 @@ if (isset($_GET['status'])) {
             </div>
         </div>
     </div>
+
+    <!-- Modal Tambah Kategori -->
+    <div class="modal fade" id="kategoriModal" tabindex="-1" aria-labelledby="kategoriModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <form id="formTambahKategori">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="kategoriModalLabel">Tambah Kategori Baru</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="nama_kategori" class="form-label">Nama Kategori</label>
+                <input type="text" class="form-control" id="nama_kategori" name="nama_kategori" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-primary">Simpan</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('kategori_id').addEventListener('change', function () {
+            if (this.value === 'tambah') {
+                var modal = new bootstrap.Modal(document.getElementById('kategoriModal'));
+                modal.show();
+                this.value = "";
+            }
+        });
+
+        $('#formTambahKategori').on('submit', function (e) {
+            e.preventDefault();
+            var namaKategori = $('#nama_kategori').val();
+
+            $.post('../../controllers/tambah_kategori_ajax.php', { nama_kategori: namaKategori }, function (res) {
+                if (res.status === 'success') {
+                    $('#kategori_id').append(
+                        `<option value="${res.id}" selected>${res.nama}</option>`
+                    );
+                    $('#kategoriModal').modal('hide');
+                    $('#nama_kategori').val('');
+                } else {
+                    alert(res.message || 'Gagal menambah kategori.');
+                }
+            }, 'json');
+        });
+    </script>
 </body>
 </html>

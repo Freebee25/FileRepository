@@ -1,5 +1,5 @@
 <?php
-require '../../database/db.php'; // Pastikan path ini benar
+require '../../database/db.php'; // 
 session_start();
 
 // Periksa apakah pengguna telah login
