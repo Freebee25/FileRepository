@@ -16,8 +16,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <title>Manage User</title>
     <link rel="stylesheet" href="../auth/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../fontawesome/css/font-awesome.min.css">
 </head>
-<body class="p-4">
+<body class="m-0 p-0">
+<?php include '../template/navbar.php'; ?>
+<div class="container mt-4">
     <h2>Manage User</h2>
     <a href="add_user.php" class="btn btn-success mb-3">+ Tambah User</a>
     <table class="table table-bordered">
@@ -41,5 +44,6 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
             <?php endforeach ?>
         </tbody>
     </table>
+</div>
 </body>
 </html>

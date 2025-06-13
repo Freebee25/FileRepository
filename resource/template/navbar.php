@@ -25,6 +25,9 @@ if (session_status() === PHP_SESSION_NONE) {
 <body>
     <header class="bg-light p-3 border-bottom">
         <div class="container d-flex justify-content-between align-items-center">
+            <a href="../views/dashboard.php">              
+                <img src="../img/apn.png" alt="logo" style="height: 45px; margin-right: 5px;" >
+            </a>
             <!-- Navigation Menu -->
             <nav>
                 <ul class="nav">

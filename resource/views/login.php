@@ -1,20 +1,23 @@
-<!DOCTYPE html>
 <html>
-<head>
+    <head>
+    <!DOCTYPE html>
 <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Login</title>
     <link rel="stylesheet" href="../css/bootstrap.min.css">
     <link rel="stylesheet" href="../fontawesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="../css/logo.css">
     <script src="../js/bootstrap.bundle.min.js"></script>
 </head>
 
 <body>
-    <div class="container mt-5">
+    <div class="header">
+        <img src="../img/apn.png" alt="logo" class="logo">
+    </div>
+    <div class="container mt-5 clearfix" >
         <div class="text-center">
-
             <!-- Welcome Message -->
-            <div class="alert alert-info text-start" role="alert">
+            <div class="alert alert-info text-start " role="alert">
                 <strong>Selamat Datang di Sistem Aplikasi</strong><br>
                 Silahkan menggunakan akun yang anda miliki untuk login.
             </div>
