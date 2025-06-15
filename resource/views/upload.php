@@ -152,7 +152,7 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             e.preventDefault();
             var namaKategori = $('#nama_kategori').val();
 
-            $.post('../../controllers/tambah_kategori_ajax.php', { nama_kategori: namaKategori }, function (res) {
+            $.post('../../controllers/tambah_kategori.php', { nama_kategori: namaKategori }, function (res) {
                 if (res.status === 'success') {
                     $('#kategori_id').append(
                         `<option value="${res.id}" selected>${res.nama}</option>`

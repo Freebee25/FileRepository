@@ -3,7 +3,7 @@ require '../../database/db.php';
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../resource/login.php");
+    header("Location: ../resource/views/login.php");
     exit;
 }
 
@@ -36,6 +36,8 @@ try {
 </head>
 <body>
 <?php include '../template/navbar.php'; ?>
+
+
 <div class="container mt-5">
     <h2>Detail File</h2>
     <p class="text-muted">Informasi lengkap file terkait</p>
@@ -53,36 +55,69 @@ try {
                     <i class="fa fa-arrow-left"></i> Kembali
                 </a>
 
-                <!-- Modal Password -->
-                <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <form action="../../controllers/decrypt.php" method="POST" class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Masukkan Password</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <input type="hidden" name="path" value="<?= htmlspecialchars($file['path']) ?>">
-                                <div class="mb-3">
-                                    <label>Password File</label>
-                                    <input type="password" class="form-control" name="password" required>
-                                </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                                <button class="btn btn-success" type="submit"><i class="fa fa-download"></i> Download</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                <div>
+                <?php if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin') : ?>
+                        <!-- Tombol Hapus File -->
+                        <button type="button" class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fa fa-trash"></i> Hapus File
+                        </button>
+                    <?php endif; ?>
 
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#passwordModal">
-                    <i class="fa fa-download"></i> Download File
-                </button>
+                    <!-- Tombol Download File -->
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#passwordModal">
+                        <i class="fa fa-download"></i> Download File
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Modal Download -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="../../controllers/decrypt.php" method="POST" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Masukkan Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="path" value="<?= htmlspecialchars($file['path']) ?>">
+                <div class="mb-3">
+                    <label>Password File</label>
+                    <input type="password" class="form-control" name="password" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-success" type="submit"><i class="fa fa-download"></i> Download</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Hapus File (khusus admin) -->
+<?php if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin') : ?>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <form action="../../controllers/deleteFileController.php" method="POST" class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Hapus</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Apakah Anda yakin ingin menghapus file <strong><?= htmlspecialchars($file['nama_file']) ?></strong>?</p>
+                <input type="hidden" name="id" value="<?= $file['id'] ?>">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button class="btn btn-danger" type="submit"><i class="fa fa-trash"></i> Hapus</button>
+            </div>
+        </form>
+    </div>
+</div>
+<?php endif; ?>
+
 <script src="../js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

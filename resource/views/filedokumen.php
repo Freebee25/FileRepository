@@ -39,6 +39,8 @@ try {
     <link rel="stylesheet" href="../fontawesome/css/font-awesome.min.css">
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
 <?php include '../template/navbar.php'; ?>
@@ -163,7 +165,6 @@ function filterRows() {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center">Tidak ada hasil yang cocok.</td></tr>`;
         pagination.innerHTML = '';
     } else {
-        // Kembalikan semua row ke tbody (jaga2 kalau ada innerHTML di-reset)
         tbody.innerHTML = '';
         filteredRows.forEach(row => tbody.appendChild(row));
         createPagination();
@@ -174,9 +175,22 @@ function filterRows() {
 document.getElementById('searchInput').addEventListener('input', filterRows);
 document.getElementById('filterKategori').addEventListener('change', filterRows);
 
-// Inisialisasi
 filterRows();
 </script>
+
+<!-- SweetAlert success setelah hapus file -->
+<?php if (isset($_GET['status']) && $_GET['status'] === 'deleted') : ?>
+<script>
+    Swal.fire({
+        title: 'Berhasil!',
+        text: 'File telah dihapus dari sistem.',
+        icon: 'success',
+        confirmButtonText: 'Oke',
+        timer: 3000,
+        timerProgressBar: true
+    });
+</script>
+<?php endif; ?>
 
 </body>
 </html>
