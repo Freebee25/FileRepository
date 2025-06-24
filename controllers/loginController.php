@@ -1,7 +1,5 @@
-<?php
+<?php 
 require '../database/db.php';
-require '../helpers/mailer.php';
-require '../helpers/Sha3.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
@@ -12,32 +10,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->execute([$username]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    // Cek apakah user ditemukan
+    // Cek apakah user ditemukan dan password benar
     if ($user && password_verify($password, $user['password'])) {
-
-        $timestamp = time();
-        $otp_raw = $username . $timestamp;
-
-        // Gunakan SHA-3 untuk menghasilkan hash OTP
-        $otp_hash = hash('sha3-256', $otp_raw);
-        $otp = substr(preg_replace('/[^0-9]/', '', $otp_hash), 0, 6);
-
-        $hashed_otp = hash('sha3-256', $otp);
-        $otp_expires_at = date("Y-m-d H:i:s", strtotime("+2 minutes"));
-
-        // Simpan OTP hash ke database
-        $stmt = $conn->prepare("UPDATE users SET otp = ?, otp_expires_at = ? WHERE id = ?");
-        $stmt->execute([$hashed_otp, $otp_expires_at, $user['id']]);
-
-        // Kirim OTP ke email
-        $subject = "Kode OTP Anda";
-        $message = "<h2>Kode OTP Anda adalah: $otp</h2><p>Berlaku selama 2 menit.</p>";
-        sendMail($user['email'], $subject, $message);
-
         session_start();
 
-        // Simpan data user lengkap ke session
-        $_SESSION['otp_user_id'] = $user['id'];
+        // Simpan data user ke session
         $_SESSION['user'] = [
             'id' => $user['id'],
             'username' => $user['username'],
@@ -45,7 +22,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             'role' => $user['role']
         ];
 
-        header("Location: ../resource/views/verify_otp.php");
+        // Arahkan ke halaman utama/dashboard
+        header("Location: ../resource/views/dashboard.php");
         exit;
     } else {
         echo "<script>
@@ -54,4 +32,3 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         </script>";
     }
 }
-?>
