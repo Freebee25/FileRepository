@@ -6,6 +6,16 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $notification = '';
+
+// Notifikasi dari session (berasal dari encrypt.php)
+if (isset($_SESSION['notification'])) {
+    $type = $_SESSION['notification']['type'] === 'success' ? 'alert-success' : 'alert-danger';
+    $message = $_SESSION['notification']['message'];
+    $notification = "<div class='notification alert {$type}'>{$message}</div>";
+    unset($_SESSION['notification']); // Hapus setelah ditampilkan
+}
+
+// Notifikasi dari GET (error langsung dari URL, misalnya validasi gagal)
 if (isset($_GET['status'])) {
     switch ($_GET['status']) {
         case 'file_exists':
@@ -20,17 +30,11 @@ if (isset($_GET['status'])) {
         case 'error':
             $notification = "<div class='notification alert alert-danger'>Terjadi kesalahan saat mengupload file. Coba lagi.</div>";
             break;
-        case 'success':
-            $notification = "<div class='notification alert alert-success'>Dokumen berhasil diupload!</div>";
-            break;
         case 'db_error':
             $notification = "<div class='notification alert alert-danger'>Gagal menyimpan data ke database.</div>";
             break;
         case 'invalid_kategori':
             $notification = "<div class='notification alert alert-danger'>Kategori tidak valid.</div>";
-            break;
-        default:
-            $notification = "";
             break;
     }
 }

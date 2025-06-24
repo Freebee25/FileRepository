@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = $_POST['password'] ?? '';
     $kategori_id = $_POST['kategori_id'] ?? '';
 
-    // Pastikan kategori_id hanya berisi angka
+    // Pastikan kategori_id hanya angka
     if (!ctype_digit($kategori_id)) {
         header("Location: ../resource/views/upload.php?status=invalid_kategori");
         exit;
@@ -67,14 +67,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $key = substr(hash('sha256', $password, true), 0, 16);
         $nonce = substr(md5(uniqid('', true)), 0, 8);
 
+        $startTime = microtime(true);
+
         $aes = new AES($key);
         $ctr = new CTR($aes);
         $ciphertext = $ctr->encrypt($plaintext, $nonce);
 
+        $endTime = microtime(true);
+        $encryptionTime = round($endTime - $startTime, 4);
+
         $output = base64_encode($nonce . $ciphertext);
         file_put_contents($encryptedPath, $output);
 
-        // Simpan metadata ke database
         $stmt = $conn->prepare("INSERT INTO dokumen 
             (nama_file, size_file, tanggal_upload, deskripsi, path, password, kategori_id)
             VALUES (:nama_file, :size_file, :tanggal_upload, :deskripsi, :path, :password, :kategori_id)");
@@ -90,7 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         ]);
 
         if ($success) {
-            header("Location: ../resource/views/upload.php?status=success");
+            $_SESSION['notification'] = [
+                'type' => 'success',
+                'message' => "Dokumen berhasil dienkripsi dan diupload!<br><strong>Waktu enkripsi:</strong> {$encryptionTime} detik"
+            ];
+            header("Location: ../resource/views/upload.php");
         } else {
             header("Location: ../resource/views/upload.php?status=db_error");
         }
