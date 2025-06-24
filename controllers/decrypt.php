@@ -33,12 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
         // Ambil data terenkripsi dari file
-        $encryptedData = file_get_contents($encryptedFilePath);
+        $base64Data = file_get_contents($encryptedFilePath);
+        $decodedData = base64_decode($base64Data); 
 
         // Ambil nonce (8 byte pertama) dan ciphertext (sisanya)
-        $nonce = substr($encryptedData, 0, 8);
-        $ciphertext = substr($encryptedData, 8);
-
+        $nonce = substr($decodedData, 0, 8);
+        $ciphertext = substr($decodedData, 8);
+        
         // Buat key dari password pengguna (harus sama seperti saat enkripsi)
         $key = substr(hash('sha256', $inputPassword, true), 0, 16);
 
