@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 // Tampilkan notifikasi
                 notifArea.innerHTML = `
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
-                        ✅ File berhasil didekripsi dan diunduh dalam ${duration} detik.
+                        File berhasil didekripsi dan diunduh! <br> Waktu Dekripsi ${duration} detik.
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 `;
