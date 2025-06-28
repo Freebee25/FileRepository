@@ -2,7 +2,7 @@
 require '../../database/db.php';
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../resource/views/login.php");
     exit;
 }
@@ -37,6 +37,7 @@ try {
 <body>
 <?php include '../template/navbar.php'; ?>
 
+<div id="notifArea" class="container mt-3"></div>
 
 <div class="container mt-5">
     <h2>Detail File</h2>
@@ -75,26 +76,41 @@ try {
 
 <!-- Modal Download -->
 <div class="modal fade" id="passwordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <form action="../../controllers/decrypt.php" method="POST" class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Masukkan Password</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="path" value="<?= htmlspecialchars($file['path']) ?>">
-                <div class="mb-3">
-                    <label>Password File</label>
-                    <input type="password" class="form-control" name="password" required>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button class="btn btn-success" type="submit"><i class="fa fa-download"></i> Download</button>
-            </div>
-        </form>
-    </div>
+  <div class="modal-dialog modal-dialog-centered">
+    <form id="decryptForm" class="modal-content" method="post" action="javascript:void(0);" autocomplete="off">
+      <div class="modal-header">
+        <h5 class="modal-title">Masukkan Password</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+
+        <!-- 🛑 Anti autofill username palsu -->
+        <input type="text" name="fakeusernameremembered" style="display:none" autocomplete="username">
+        <input type="password" name="fakepasswordremembered" style="display:none" autocomplete="new-password">
+
+        <input type="hidden" name="path" value="<?= htmlspecialchars($file['path']) ?>">
+
+        <div class="mb-3">
+          <label>Password File</label>
+          <input
+            type="password"
+            class="form-control"
+            name="password"
+            autocomplete="new-password"
+            required
+          >
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button class="btn btn-success" type="submit" id="submitDecrypt">
+          <i class="fa fa-download"></i> Download
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
+
 
 <!-- Modal Hapus File (khusus admin) -->
 <?php if (isset($_SESSION['user']['role']) && $_SESSION['user']['role'] === 'admin') : ?>
@@ -119,5 +135,78 @@ try {
 <?php endif; ?>
 
 <script src="../js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('decryptForm');
+    const modalEl = document.getElementById('passwordModal');
+    const notifArea = document.getElementById('notifArea');
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const formData = new FormData(form);
+        const startTime = performance.now();
+
+        fetch("../../controllers/decrypt.php", {
+            method: "POST",
+            body: formData
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Gagal dekripsi");
+
+            const filename = response.headers.get("Content-Disposition")
+                ?.split("filename=")[1]?.replace(/"/g, "") || "file_dekripsi";
+
+            return response.blob().then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                const endTime = performance.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+                // Tutup modal secara paksa dan bersihkan backdrop
+                const bsModal = bootstrap.Modal.getInstance(modalEl);
+                if (bsModal) bsModal.hide();
+
+                document.body.classList.remove('modal-open');
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) backdrop.remove();
+
+                // Tampilkan notifikasi
+                notifArea.innerHTML = `
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        File berhasil didekripsi dan diunduh! <br> Waktu Dekripsi ${duration} detik.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `;
+            });
+        })
+        .catch(error => {
+            // Tutup modal jika error juga
+            const bsModal = bootstrap.Modal.getInstance(modalEl);
+            if (bsModal) bsModal.hide();
+
+            document.body.classList.remove('modal-open');
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) backdrop.remove();
+
+            notifArea.innerHTML = `
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                     Gagal mendekripsi file: ${error.message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            `;
+        });
+    });
+});
+</script>
+
+
 </body>
 </html>

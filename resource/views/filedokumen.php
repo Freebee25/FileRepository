@@ -2,7 +2,7 @@
 require '../../database/db.php';
 session_start();
 
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user']['id'])) {
     header("Location: ../resource/views/login.php");
     exit;
 }
